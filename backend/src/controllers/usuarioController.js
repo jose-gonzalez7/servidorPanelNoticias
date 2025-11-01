@@ -32,4 +32,50 @@ async function getAllUsersAdmin(req, res) {
   }
 }
 
-module.exports = { getAllUsers, getAllUsersAdmin };
+async function createUser(req, res) {
+  console.log('=== 🔹 Solicitud POST /usuarios 🔹 ===');
+  console.log('Usuario que hace la petición (admin):', req.user);
+  console.log('Datos recibidos para crear usuario:', req.body);
+
+  try {
+    const nuevoUsuario = await usuarioService.createUser(req.body);
+    console.log('Nuevo usuario creado:', nuevoUsuario);
+    
+    res.status(201).json({ success: true, user: nuevoUsuario });
+  } catch (err) {
+    console.error('Error al crear usuario:', err);
+    res.status(500).json({ success: false, message: "Error al crear usuario" });
+  }
+}
+
+async function deleteUser(req, res) {
+  console.log('=== 🔹 Solicitud DELETE /usuarios 🔹 ===');
+  console.log('Usuario que hace la petición (admin):', req.user);
+  console.log('Datos recibidos para eliminar usuario:', req.body);
+  
+  try {
+    const result = await usuarioService.deleteUser(req.body.email);
+    console.log('Resultado de la eliminación del usuario:', result);
+    res.json({ success: true, message: "Usuario eliminado correctamente" });
+  } catch (err) {
+    console.error('Error al eliminar usuario:', err);
+    res.status(500).json({ success: false, message: "Error al eliminar usuario" });
+  }
+}
+
+async function modificarUser(req, res) {
+  console.log('=== 🔹 Solicitud PUT /usuarios 🔹 ===');
+  console.log('Usuario que hace la petición (admin):', req.user);
+  console.log('Datos recibidos para modificar usuario:', req.body);
+
+  try{
+    const result = await usuarioService.modificarUser(req.body);
+    console.log('Resultado de la modificación del usuario:', result);
+    res.json({ success: true, message: "Usuario modificado correctamente" });
+  } catch (err) {
+    console.error('Error al modificar usuario:', err);
+    res.status(500).json({ success: false, message: "Error al modificar usuario" });
+  }
+}
+
+module.exports = { getAllUsers, getAllUsersAdmin, createUser, deleteUser, modificarUser };

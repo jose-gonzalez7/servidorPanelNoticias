@@ -49,7 +49,7 @@ model notificacion {
 }
 
 model usuario {
-  id_usuario    String  @id @db.VarChar(20)
+  id_usuario    String  @id @default(uuid())
   nombre        String  @db.VarChar(50)
   email         String  @db.VarChar(100) @unique
   rol           String  @db.VarChar(13)
