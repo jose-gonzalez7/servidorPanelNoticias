@@ -11,7 +11,7 @@ PASSWORD="12345678"
 NEW_USER_NAME="Juan Pérez"
 NEW_USER_EMAIL="juanperez@gmail.com"
 NEW_USER_PASSWORD="123456"
-NEW_USER_ROLE="usuario"
+NEW_USER_ROLE="profesor"
 
 # -------------------------------
 # 1️⃣ Login y obtener token

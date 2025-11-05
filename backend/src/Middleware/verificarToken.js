@@ -14,11 +14,14 @@ function verifyToken(req, res, next) {
   });
 }
 
-function requireRole(role) {
+function requireRole(...rolesPermitidos) {
   return (req, res, next) => {
-    if (req.user.rol !== role) {
+    const rolUsuario = req.user?.rol;
+
+    if (!rolUsuario || !rolesPermitidos.includes(rolUsuario)) {
       return res.status(403).json({ message: "Acceso denegado: rol insuficiente" });
     }
+
     next();
   };
 }

@@ -23,6 +23,10 @@ async function createUser(data) {
     throw new Error(`El email ${email} ya está registrado`);
   }
 
+  if (!ComprobarRol(rol)) {
+    throw new Error(`El rol ${rol} no es válido. Debe ser 'editor' o 'profesor'`);
+  }
+
   // 2️⃣ Generar hash de la contraseña
   const saltRounds = 10;
   const password_hash = await bcrypt.hash(contraseña, saltRounds);
@@ -90,5 +94,9 @@ async function modificarUser(data) {
   return updatedUser;
 }
 
+function ComprobarRol(rol) {
+  const rolesValidos = ['editor', 'profesor'];
+  return rolesValidos.includes(rol);
+}
 
 module.exports = { listUsers, createUser, deleteUser, modificarUser };
