@@ -4,6 +4,7 @@ const app = express();
 const authRoutes = require('./routes/autenticacion.routes');
 const usuarioRoutes = require('./routes/usuariosRoutes');
 const categoriaRoutes = require('./routes/categoriaRoutes');
+const publicacionesRoutes = require('./routes/publicacionesRoutes');
 
 
 // Permitir solicitudes desde cualquier origen (para desarrollo)
@@ -20,5 +21,8 @@ app.use('/api/usuarios', usuarioRoutes);
 
 //Ruta para las categorías
 app.use('/api/categorias', categoriaRoutes);
+
+//Ruta para las publicaciones
+app.use('/api/publicaciones', publicacionesRoutes);
 
 module.exports = app;

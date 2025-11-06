@@ -1,6 +1,7 @@
+require('dotenv').config();
 const bcrypt = require('bcrypt');
 const prisma = require('../prisma/client'); // ajusta la ruta
-require('dotenv').config();
+
 
 async function main() {
   const saltRounds = 10;
