@@ -8,7 +8,7 @@ router.get("/", verifyToken, requireRole("administrador", "editor"), categoriaCo
 
 //rutas para crear, actualizar y eliminar categorías
 router.post("/", verifyToken, requireRole("administrador"), categoriaController.createCategory);
-//router.put("/", verifyToken, requireRole("administrador"), categoriaController.updateCategory);
+router.put("/", verifyToken, requireRole("administrador"), categoriaController.updateCategory);
 router.delete("/", verifyToken, requireRole("administrador"), categoriaController.deleteCategory);
 
 module.exports = router;

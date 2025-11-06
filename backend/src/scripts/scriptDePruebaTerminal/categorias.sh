@@ -54,29 +54,29 @@ CREATE_RESPONSE=$(curl -s -X POST "$API_URL/categorias" \
 echo "Respuesta al crear categoría:"
 echo $CREATE_RESPONSE | jq
 
-# # -------------------------------
-# # 3️⃣ Listar categorías (actualizada)
-# # -------------------------------
-# echo "Solicitando lista de categorías..."
-# curl -s -X GET "$API_URL/categorias" \
-#   -H "Authorization: Bearer $TOKEN" \
-#   -H "Content-Type: application/json" \
-#   | jq
+# -------------------------------
+# 3️⃣ Listar categorías (actualizada)
+# -------------------------------
+echo "Solicitando lista de categorías..."
+curl -s -X GET "$API_URL/categorias" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  | jq
 
-# # -------------------------------
-# # 4️⃣ Modificar la categoría creada
-# # -------------------------------
-# echo "Modificando la categoría creada..."
-# MODIFY_RESPONSE=$(curl -s -X PUT "$API_URL/categorias" \
-#   -H "Authorization: Bearer $TOKEN" \
-#   -H "Content-Type: application/json" \
-#   -d "{
-#         \"id_categoria\": \"$NEW_CATEGORY_ID\",
-#         \"nuevoNombre\": \"Tecnología y Ciencia\"
-#       }")
+# -------------------------------
+# 4️⃣ Modificar la categoría creada
+# -------------------------------
+echo "Modificando la categoría creada..."
+MODIFY_RESPONSE=$(curl -s -X PUT "$API_URL/categorias" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{
+        \"id_categoria\": \"$NEW_CATEGORY_ID\",
+        \"nuevoNombre\": \"Tecnología y Ciencia\"
+      }")
 
-# echo "Respuesta al modificar categoría:"
-# echo $MODIFY_RESPONSE | jq
+echo "Respuesta al modificar categoría:"
+echo $MODIFY_RESPONSE | jq
 
 # -------------------------------
 # 5️⃣ Listar categorías nuevamente

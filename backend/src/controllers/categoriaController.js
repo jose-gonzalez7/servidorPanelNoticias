@@ -30,21 +30,24 @@ async function createCategory(req, res) {
 }
 
 async function updateCategory(req, res) {
-    console.log('=== 🔹 Solicitud PUT /categorias/:id ahora mismo no esta implementada🔹 ===');
-    /*console.log('=== 🔹 Solicitud PUT /categorias/:id 🔹 ===');
-    console.log('Usuario que hace la petición (admin):', req.user);
-    console.log('ID de la categoría a actualizar:', req.params.id);
-    console.log('Datos recibidos para actualizar categoría:', req.body);
-    
+  console.log('=== 🔹 Solicitud PUT /categorias/:id 🔹 ===');
+  console.log('Usuario que hace la petición (admin):', req.user);
+  console.log('Datos recibidos para actualizar categoría:', req.body);
+  
   try {
-    const updatedCategory = await categoriaService.updateCategory(req.params.id, req.body);
+    const categoryId = req.body.id_categoria;
+    const nuevoNombre = req.body.nuevoNombre;
+
+    const updatedCategory = await categoriaService.updateCategory(categoryId, { nombre: nuevoNombre });
+
     console.log('Categoría actualizada:', updatedCategory);
-    res.json(updatedCategory);
+    res.json({ message: 'Categoría actualizada correctamente', categoria: updatedCategory });
   } catch (error) {
     console.error('Error al actualizar categoría:', error);
     res.status(500).json({ error: 'Error al actualizar categoría' });
-  }*/
+  }
 }
+
 
 async function deleteCategory(req, res) {
   const { id_categoria } = req.body;
