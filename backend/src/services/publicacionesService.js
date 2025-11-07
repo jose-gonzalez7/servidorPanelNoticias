@@ -69,7 +69,7 @@ async function sendUrgentEmail(publicacion, destinatarios) {
     if (!destinatarios || !destinatarios.length) throw new Error("No se proporcionaron destinatarios");
 
     const transporter = nodemailer.createTransport({
-      service: "gmail", // o cualquier servicio SMTP
+      service: "gmail",
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -88,12 +88,40 @@ async function sendUrgentEmail(publicacion, destinatarios) {
       `,
     };
 
-    await transporter.sendMail(mailOptions);
-    console.log("✅ Email(s) enviado(s) correctamente");
+    let estado = "enviado";
+    let errorMensaje = null;
 
-    return { success: true, mensaje: "Emails enviados correctamente" };
+    // Intentar enviar el email
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log("✅ Email(s) enviado(s) correctamente");
+    } catch (error) {
+      estado = "error";
+      errorMensaje = error.message;
+      console.error("❌ Error al enviar email:", error.message);
+    }
+
+    // Guardar el log del email en la base de datos en un bloque try/catch separado
+    try {
+      await prisma.email_log.create({
+        data: {
+          id_publicacion: publicacion.id_publicacion,
+          destinatarios: destinatarios.join(", "),
+          asunto: mailOptions.subject,
+          cuerpo: publicacion.cuerpo,
+          estado,
+          error_mensaje: errorMensaje,
+        },
+      });
+      console.log("📩 Registro de email guardado correctamente");
+    } catch (dbError) {
+      console.error("❌ Error al guardar el log del email:", dbError.message);
+    }
+
+    return { success: estado === "enviado", mensaje: errorMensaje ?? "Emails enviados correctamente" };
+
   } catch (error) {
-    console.error("❌ Error al enviar email:", error.message);
+    console.error("❌ Error general en sendUrgentEmail:", error.message);
     return { success: false, mensaje: error.message };
   }
 }

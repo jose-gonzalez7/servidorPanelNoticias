@@ -37,6 +37,7 @@ model publicaciones {
   salidaalumno   salidaalumno?
   baja           baja?
   guardia        guardia?
+  email_logs     email_log[] @relation("HistorialEmail") 
 }
 
 model notificacion {
@@ -95,6 +96,20 @@ model guardia {
 
   publicacion    publicaciones @relation(fields: [id_publicacion], references: [id_publicacion])
 }
+
+model email_log {
+  id_email      String      @id @default(uuid())
+  id_publicacion String     @db.VarChar(50)
+  destinatarios String       @db.Text
+  asunto        String       @db.VarChar(150)
+  cuerpo        String       @db.Text
+  fecha_envio   DateTime     @default(now())
+  estado        String       @db.VarChar(20) // "enviado" | "error"
+  error_mensaje String?      @db.Text
+
+  publicacion    publicaciones @relation("HistorialEmail", fields: [id_publicacion], references: [id_publicacion])
+}
+
 
 
 
