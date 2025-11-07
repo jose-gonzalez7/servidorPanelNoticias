@@ -7,9 +7,6 @@ async function getAllUsers(req, res) {
   try {
     const users = await usuarioService.listUsers();
 
-    // 🔹 Debug: mostrar lista de usuarios obtenida
-    console.log('Usuarios obtenidos:', users);
-
     res.json({ success: true, users });
   } catch (err) {
     console.error('Error al obtener usuarios:', err);
@@ -23,7 +20,6 @@ async function getAllUsersAdmin(req, res) {
 
   try {
     const users = await usuarioService.listUsers();
-    console.log('Usuarios obtenidos (admin):', users);
 
     res.json({ success: true, users });
   } catch (err) {
@@ -39,7 +35,6 @@ async function createUser(req, res) {
 
   try {
     const nuevoUsuario = await usuarioService.createUser(req.body);
-    console.log('Nuevo usuario creado:', nuevoUsuario);
     
     res.status(201).json({ success: true, user: nuevoUsuario });
   } catch (err) {
@@ -55,7 +50,6 @@ async function deleteUser(req, res) {
   
   try {
     const result = await usuarioService.deleteUser(req.body.email);
-    console.log('Resultado de la eliminación del usuario:', result);
     res.json({ success: true, message: "Usuario eliminado correctamente" });
   } catch (err) {
     console.error('Error al eliminar usuario:', err);
@@ -70,7 +64,6 @@ async function modificarUser(req, res) {
 
   try{
     const result = await usuarioService.modificarUser(req.body);
-    console.log('Resultado de la modificación del usuario:', result);
     res.json({ success: true, message: "Usuario modificado correctamente" });
   } catch (err) {
     console.error('Error al modificar usuario:', err);

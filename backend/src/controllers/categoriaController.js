@@ -6,7 +6,6 @@ async function getAllCategories(req, res) {
   
   try {
     const categories = await categoriaService.listCategories();
-    console.log('Categorías obtenidas:', categories);
     res.json(categories);
   } catch (error) {
     console.error('Error al obtener categorías:', error);
@@ -21,7 +20,6 @@ async function createCategory(req, res) {
 
   try {
     const newCategory = await categoriaService.createCategory(req.body);
-    console.log('Categoría creada:', newCategory);
     res.status(201).json(newCategory);
   } catch (error) {
     console.error('Error al crear categoría:', error);
@@ -39,8 +37,6 @@ async function updateCategory(req, res) {
     const nuevoNombre = req.body.nuevoNombre;
 
     const updatedCategory = await categoriaService.updateCategory(categoryId, { nombre: nuevoNombre });
-
-    console.log('Categoría actualizada:', updatedCategory);
     res.json({ message: 'Categoría actualizada correctamente', categoria: updatedCategory });
   } catch (error) {
     console.error('Error al actualizar categoría:', error);
@@ -50,17 +46,24 @@ async function updateCategory(req, res) {
 
 
 async function deleteCategory(req, res) {
-  const { id_categoria } = req.body;
+  const { id_categoria } = req.body; 
+  console.log("=== 🔹 Solicitud DELETE /categorias/:id 🔹 ===");
+  console.log(req.body);
   console.log("ID de la categoría a eliminar:", id_categoria);
+
+  if (!id_categoria) {
+    return res.status(400).json({ error: "Falta el id_categoria en el body" });
+  }
 
   try {
     await categoriaService.deleteCategory(id_categoria);
-    res.json({ message: "Categoría eliminada correctamente" });
+    res.json({ message: `Categoría ${id_categoria} eliminada correctamente` });
   } catch (error) {
     console.error("Error al eliminar categoría:", error);
     res.status(500).json({ error: "Error al eliminar categoría" });
   }
 }
+
 
 
 module.exports = {

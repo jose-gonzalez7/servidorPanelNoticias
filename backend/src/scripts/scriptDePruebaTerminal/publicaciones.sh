@@ -36,27 +36,27 @@ fi
 
 echo "✅ Token obtenido correctamente."
 
-# # -------------------------------
-# # 2️⃣ Crear nueva publicación
-# # -------------------------------
-# echo "Creando nueva publicación..."
-# CREATE_RESPONSE=$(curl -s -X POST "$API_URL/publicaciones" \
-#   -H "Authorization: Bearer $TOKEN" \
-#   -H "Content-Type: application/json" \
-#   -d "{
-#         \"id_publicacion\": \"$PUB_ID\",
-#         \"titulo\": \"$PUB_TITLE\",
-#         \"cuerpo\": \"$PUB_BODY\",
-#         \"id_categoria\": \"$PUB_CATEGORY\",
-#         \"fecha_inicio\": \"$PUB_START_DATE\",
-#         \"fecha_fin\": \"$PUB_END_DATE\",
-#         \"prioridad\": \"$PUB_PRIORITY\",
-#         \"adjuntos\": \"$PUB_ATTACHMENTS\",
-#         \"etiquetas\": \"$PUB_TAGS\"
-#       }")
+# -------------------------------
+# 2️⃣ Crear nueva publicación
+# -------------------------------
+echo "Creando nueva publicación..."
+CREATE_RESPONSE=$(curl -s -X POST "$API_URL/publicaciones" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{
+        \"id_publicacion\": \"$PUB_ID\",
+        \"titulo\": \"$PUB_TITLE\",
+        \"cuerpo\": \"$PUB_BODY\",
+        \"id_categoria\": \"$PUB_CATEGORY\",
+        \"fecha_inicio\": \"$PUB_START_DATE\",
+        \"fecha_fin\": \"$PUB_END_DATE\",
+        \"prioridad\": \"$PUB_PRIORITY\",
+        \"adjuntos\": \"$PUB_ATTACHMENTS\",
+        \"etiquetas\": \"$PUB_TAGS\"
+      }")
 
-# echo "Respuesta al crear publicación:"
-# echo $CREATE_RESPONSE | jq
+echo "Respuesta al crear publicación:"
+echo $CREATE_RESPONSE | jq
 
 # -------------------------------
 # 3️⃣ Solicitar lista de publicaciones
@@ -67,48 +67,56 @@ curl -s -X GET "$API_URL/publicaciones" \
   -H "Content-Type: application/json" \
   | jq
 
-# # -------------------------------
-# # 4️⃣ Modificar la publicación creada
-# # -------------------------------
-# echo "Modificando la publicación creada..."
-# MODIFY_RESPONSE=$(curl -s -X PUT "$API_URL/publicaciones/$PUB_ID" \
-#   -H "Authorization: Bearer $TOKEN" \
-#   -H "Content-Type: application/json" \
-#   -d "{
-#         \"nuevoTitulo\": \"Reunión General de Profesores\",
-#         \"cuerpo\": \"Se realizará la reunión general de profesores en el aula magna a las 10:00.\"
-#       }")
+# -------------------------------
+# 4️⃣ Modificar la publicación creada
+# -------------------------------
+echo "Modificando la publicación creada..."
+MODIFY_RESPONSE=$(curl -s -X PUT "$API_URL/publicaciones" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{
+        \"id_publicacion\": \"$PUB_ID\",
+        \"titulo\": \"Reunión General de Profesores\",
+        \"cuerpo\": \"Se realizará la reunión general de profesores en el aula magna a las 10:00.\"
+      }")
 
-# echo "Respuesta al modificar publicación:"
-# echo $MODIFY_RESPONSE | jq
+echo "Respuesta al modificar publicación:"
+echo $MODIFY_RESPONSE | jq
 
-# # -------------------------------
-# # 5️⃣ Solicitar lista de publicaciones actualizada
-# # -------------------------------
-# echo "Solicitando lista de publicaciones actualizada..."
-# curl -s -X GET "$API_URL/publicaciones" \
-#   -H "Authorization: Bearer $TOKEN" \
-#   -H "Content-Type: application/json" \
-#   | jq
+# -------------------------------
+# 5️⃣ Solicitar lista de publicaciones actualizada
+# -------------------------------
+echo "Solicitando lista de publicaciones actualizada..."
+curl -s -X GET "$API_URL/publicaciones" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  | jq
 
-# # -------------------------------
-# # 6️⃣ Borrar la publicación creada
-# # -------------------------------
-# echo "Borrando la publicación creada..."
-# DELETE_RESPONSE=$(curl -s -X DELETE "$API_URL/publicaciones/$PUB_ID" \
-#   -H "Authorization: Bearer $TOKEN" \
-#   -H "Content-Type: application/json")
+# -------------------------------
+# 6️⃣ Borrar la publicación creada (enviando ID en JSON)
+# -------------------------------
+echo "Borrando la publicación creada..."
+DELETE_RESPONSE=$(curl -s -X DELETE "$API_URL/publicaciones" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{
+        \"id_publicacion\": \"$PUB_ID\"
+      }")
 
-# echo "Respuesta al borrar publicación:"
-# echo $DELETE_RESPONSE | jq
+echo "Respuesta al borrar publicación:"
+if echo "$DELETE_RESPONSE" | jq empty 2>/dev/null; then
+  echo "$DELETE_RESPONSE" | jq
+else
+  echo "$DELETE_RESPONSE"
+fi
 
-# # -------------------------------
-# # 7️⃣ Solicitar lista de publicaciones final
-# # -------------------------------
-# echo "Solicitando lista de publicaciones final..."
-# curl -s -X GET "$API_URL/publicaciones" \
-#   -H "Authorization: Bearer $TOKEN" \
-#   -H "Content-Type: application/json" \
-#   | jq
+# -------------------------------
+# 7️⃣ Solicitar lista de publicaciones final
+# -------------------------------
+echo "Solicitando lista de publicaciones final..."
+curl -s -X GET "$API_URL/publicaciones" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  | jq
 
-# echo "✅ Script de publicaciones finalizado."
+echo "✅ Script de publicaciones finalizado."

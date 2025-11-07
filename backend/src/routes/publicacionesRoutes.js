@@ -5,14 +5,14 @@ const publicacionesController = require("../controllers/publicacionesController"
 
 // Ruta para obtener todas las publicaciones
 router.get("/", verifyToken, requireRole("administrador", "editor"), publicacionesController.getAllPublicaciones);
-/*
+
 // Ruta para crear una nueva publicación
-router.post("/", verifyToken, requireRole("administrador", "editor"), publicacionesController.createPublicacion);
+router.post("/", verifyToken, requireRole("administrador"), publicacionesController.createPublicacion);
 
 // Ruta para actualizar una publicación existente
-router.put("/:id", verifyToken, requireRole("administrador", "editor"), publicacionesController.updatePublicacion);
+router.put("/", verifyToken, requireRole("administrador"), publicacionesController.updatePublicacion);
 
 // Ruta para eliminar una publicación
-router.delete("/:id", verifyToken, requireRole("administrador"), publicacionesController.deletePublicacion);*/
+router.delete("/", verifyToken, requireRole("administrador"), publicacionesController.deletePublicacion);
 
 module.exports = router;
