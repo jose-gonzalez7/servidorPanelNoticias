@@ -33,20 +33,7 @@ model publicaciones {
   etiquetas      String?     @db.VarChar(50)
 
   categoria      categoria   @relation(fields: [id_categoria], references: [id_categoria])
-  notificacion   notificacion?
-  salidaalumno   salidaalumno?
-  baja           baja?
-  guardia        guardia?
   email_logs     email_log[] @relation("HistorialEmail") 
-}
-
-model notificacion {
-  id_notificacion String        @id @db.VarChar(50)
-  asunto          String        @db.VarChar(100)
-  cuerpo          String        @db.Text
-  id_publicacion  String        @unique @db.VarChar(50)
-
-  publicacion     publicaciones @relation(fields: [id_publicacion], references: [id_publicacion])
 }
 
 model usuario {
@@ -57,45 +44,6 @@ model usuario {
   password_hash String  @db.VarChar(100)
 }
 
-
-model pantallatv {
-  id_pantalla   String  @id @db.VarChar(50)
-  nombre        String  @db.VarChar(50)
-  token_acceso  String  @db.VarChar(1000)
-  configuracion String  @db.VarChar(100)
-  rotacion      String  @db.VarChar(50)
-  last_refresh  DateTime @db.Time
-}
-
-model salidaalumno {
-  id_salida      String        @id @db.VarChar(50)
-  id_publicacion String        @unique @db.VarChar(50)
-  tipo           String        @db.VarChar(50)
-  observaciones  String?       @db.VarChar(100)
-
-  publicacion    publicaciones @relation(fields: [id_publicacion], references: [id_publicacion])
-}
-
-model baja {
-  id_baja        String        @id @db.VarChar(50)
-  id_publicacion String        @unique @db.VarChar(50)
-  profesor       String        @db.VarChar(50)
-  prioridad      String        @db.VarChar(50)
-
-  publicacion    publicaciones @relation(fields: [id_publicacion], references: [id_publicacion])
-}
-
-model guardia {
-  id_guardia     String        @id @db.VarChar(50)
-  id_publicacion String        @unique @db.VarChar(50)
-  inicio_hora    DateTime      @db.Time
-  fin_hora       DateTime      @db.Time
-  aula_o_patio   String        @db.VarChar(20)
-  observaciones  String?       @db.VarChar(100)
-  profesor       String?       @db.VarChar(50)
-
-  publicacion    publicaciones @relation(fields: [id_publicacion], references: [id_publicacion])
-}
 
 model email_log {
   id_email      String      @id @default(uuid())
@@ -108,6 +56,14 @@ model email_log {
   error_mensaje String?      @db.Text
 
   publicacion    publicaciones @relation("HistorialEmail", fields: [id_publicacion], references: [id_publicacion])
+
+  @@index([id_publicacion, fecha_envio])
+}
+
+model actividad_reciente{
+  id_usuario String @id @db.VarChar(50)
+  actividad  String @db.Text
+  fecha      DateTime @default(now())
 }
 
 
