@@ -48,11 +48,6 @@ async function updatePublicacion(req, res) {
   }
 }
 
-module.exports = {
-  updatePublicacion,
-};
-
-
 async function deletePublicacion(req, res) {
   console.log('=== 🔹 Solicitud DELETE /publicaciones/:id 🔹 ===');
   console.log('Usuario que hace la petición:', req.user);
@@ -67,9 +62,25 @@ async function deletePublicacion(req, res) {
   }
 }
 
+async function emailPublicacionController(req, res) {
+  console.log("=== 🔹 Solicitud POST /publicaciones/emailPublicaciones 🔹 ===");
+  console.log("Usuario que hace la petición:", req.user);
+  console.log("Datos recibidos para enviar email de publicación:", req.body);
+  const { id_publicacion, destinatarios } = req.body;
+
+  try {
+    const result = await publicacionesService.emailPublicacion(id_publicacion, destinatarios);
+    res.json(result);
+  } catch (error) {
+    console.error("Error al enviar email de publicación:", error.message);
+    res.status(400).json({ error: error.message });
+  }
+}
+
 module.exports = {
   getAllPublicaciones,
   createPublicacion,
   updatePublicacion,
   deletePublicacion,
+  emailPublicacionController
 };

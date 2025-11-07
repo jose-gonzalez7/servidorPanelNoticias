@@ -15,4 +15,7 @@ router.put("/", verifyToken, requireRole("administrador"), publicacionesControll
 // Ruta para eliminar una publicación
 router.delete("/", verifyToken, requireRole("administrador"), publicacionesController.deletePublicacion);
 
+// Endpoint dedicado a enviar email de publicación
+router.post("/emailPublicaciones", verifyToken ,requireRole("administrador"), publicacionesController.emailPublicacionController);
+
 module.exports = router;
