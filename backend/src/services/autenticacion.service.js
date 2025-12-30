@@ -28,7 +28,7 @@ async function authenticateUser(email, password) {
       }
     };
   } catch (error) {
-    return { error: error.message };
+    throw new Error(error.message);
   }
 }
 

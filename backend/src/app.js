@@ -25,4 +25,12 @@ app.use('/api/categorias', categoriaRoutes);
 //Ruta para las publicaciones
 app.use('/api/publicaciones', publicacionesRoutes);
 
+app.get("/", (req, res) => {
+  res.send("API Panel Noticias funcionando 🚀");
+});
+
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
+
 module.exports = app;
