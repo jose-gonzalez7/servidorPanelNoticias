@@ -7,9 +7,9 @@
 
     "seed:user": "node scripts/create_user.js",
     "seed:categories": "node scripts/create_categorias.js",
-    "seed:roles": "node scripts/create_publicaciones.js",
+    "seed:publicaciones": "node scripts/create_publicaciones.js",
 
-    "seed:all": "npm run seed:roles && npm run seed:categories && npm run seed:user",
+    "seed:all": "npm run seed:user && npm run seed:categories && npm run seed:publicaciones",
 
     "test": "echo \"Error: no test specified\" && exit 1"
   },
