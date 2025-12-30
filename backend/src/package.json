@@ -4,7 +4,13 @@
   "main": "index.js",
   "scripts": {
     "start": "prisma migrate deploy && node index.js",
-    "create-user": "node scripts/create_user.js",
+
+    "seed:user": "node scripts/create_user.js",
+    "seed:categories": "node scripts/create_categorias.js",
+    "seed:roles": "node scripts/create_publicaciones.js",
+
+    "seed:all": "npm run seed:roles && npm run seed:categories && npm run seed:user",
+
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
