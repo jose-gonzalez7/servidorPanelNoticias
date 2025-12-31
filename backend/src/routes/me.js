@@ -5,25 +5,23 @@ const prisma = require("../prisma/client");
 const router = express.Router();
 
 router.get("/me", verifyToken, async (req, res) => {
-  try {
-    const user = await prisma.usuario.findUnique({
-      where: { id: req.user.id },
-      select: {
-        id: true,
-        nombre: true,
-        email: true,
-        rol: true,
-      },
-    });
+  console.log("==== /api/me ====");
+  console.log("Cookies recibidas:", req.cookies);
+  console.log("User decodificado:", req.user);
+  console.log("=================");
 
-    if (!user) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
-    }
+  const user = await prisma.usuario.findUnique({
+    where: { id: req.user.id },
+    select: {
+      id: true,
+      nombre: true,
+      email: true,
+      rol: true,
+    },
+  });
 
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ message: "Error interno" });
-  }
+  res.json(user);
 });
+
 
 module.exports = router;
