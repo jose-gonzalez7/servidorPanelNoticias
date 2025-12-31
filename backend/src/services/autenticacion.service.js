@@ -3,33 +3,27 @@ const jwt = require('jsonwebtoken');
 const prisma = require('../prisma/client');
 
 async function authenticateUser(email, password) {
-  try {
-    // Buscar usuario por email
-    const user = await prisma.usuario.findUnique({ where: { email } });
-    if (!user) throw new Error('Usuario o contraseña incorrectos');
+  const user = await prisma.usuario.findUnique({ where: { email } });
+  if (!user) throw new Error('Usuario o contraseña incorrectos');
 
-    // Comparar contraseña
-    const valid = await bcrypt.compare(password, user.password_hash);
-    if (!valid) throw new Error('Usuario o contraseña incorrectos');
+  const valid = await bcrypt.compare(password, user.password_hash);
+  if (!valid) throw new Error('Usuario o contraseña incorrectos');
 
-    // Generar token JWT
-    const token = jwt.sign(
-      { id: user.id, email: user.email, rol: user.rol },
-      process.env.JWT_SECRET,
-      { expiresIn: '2h' }
-    );
+  const token = jwt.sign(
+    { id: user.id, email: user.email, rol: user.rol },
+    process.env.JWT_SECRET,
+    { expiresIn: '2h' }
+  );
 
-    return {
-      token,
-      user: {
-        nombre: user.nombre,
-        email: user.email,
-        rol: user.rol
-      }
-    };
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  return {
+    token, // 👈 lo seguimos devolviendo INTERNAMENTE
+    user: {
+      id: user.id,
+      nombre: user.nombre,
+      email: user.email,
+      rol: user.rol
+    }
+  };
 }
 
 module.exports = { authenticateUser };

@@ -1,17 +1,19 @@
 const jwt = require("jsonwebtoken");
 
 function verifyToken(req, res, next) {
-  const header = req.headers["authorization"];
-  const token = header && header.split(" ")[1]; // Formato esperado: "Bearer token"
+  const token = req.cookies.token; // 👈 cookie httpOnly
 
-  if (!token) return res.status(403).json({ message: "Token requerido" });
+  if (!token) {
+    return res.status(401).json({ message: "No autenticado" });
+  }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) return res.status(401).json({ message: "Token inválido o expirado" });
-
-    req.user = decoded; // Aquí tienes { id, email, rol }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // { id, email, rol }
     next();
-  });
+  } catch {
+    return res.status(401).json({ message: "Token inválido o expirado" });
+  }
 }
 
 function requireRole(...rolesPermitidos) {
