@@ -6,24 +6,24 @@ async function login(req, res) {
   try {
     const { token, user } = await authenticateUser(email, password);
 
-    // 🔐 COOKIE HTTPONLY
+    const isProd = process.env.NODE_ENV === 'production';
+
     res.cookie('token', token, {
       httpOnly: true,
-      secure: true,          // 🔴 SIEMPRE TRUE EN RAILWAY
-      sameSite: 'none',      // 🔴 CLAVE PARA DOMINIOS DIFERENTES
+      secure: isProd,                    // ❗ false en localhost
+      sameSite: isProd ? 'none' : 'lax', // ❗ lax en localhost
       maxAge: 2 * 60 * 60 * 1000,
     });
 
-    // ❗️NO DEVOLVEMOS EL TOKEN
     res.json({
       success: true,
-      user
+      user,
     });
 
   } catch (err) {
     res.status(401).json({
       success: false,
-      message: err.message
+      message: err.message,
     });
   }
 }
