@@ -6,6 +6,7 @@ const authRoutes = require('./routes/autenticacion.routes');
 const usuarioRoutes = require('./routes/usuariosRoutes');
 const categoriaRoutes = require('./routes/categoriaRoutes');
 const publicacionesRoutes = require('./routes/publicacionesRoutes');
+const meRoutes = require('./routes/me');
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use(express.json());
 /**
  * Rutas
  */
+app.use('/api', meRoutes);
 app.use('/api', authRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/categorias', categoriaRoutes);
