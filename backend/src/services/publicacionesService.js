@@ -2,6 +2,37 @@ const e = require("express");
 const prisma = require("../prisma/client");
 const nodemailer = require("nodemailer");
 
+async function registrarActividad(usuarioId, descripcion) {
+  try {
+    if (!usuarioId) {
+      console.warn("⚠️ No se proporcionó usuarioId para el registro de actividad.");
+      return; 
+    }
+    await prisma.actividad_reciente.create({
+      data: {
+        id_usuario: usuarioId,
+        actividad: descripcion,
+      },
+    });
+    console.log(`📝 Actividad registrada: ${descripcion}`);
+  } catch (error) {
+    // Solo logueamos el error, no detenemos el flujo principal si falla el log
+    console.error("❌ Error al registrar actividad reciente:", error.message);
+  }
+}
+
+async function devolverActividad(usuarioId) {
+  try {
+    const actividades = await prisma.actividad_reciente.findMany({
+      where: { id_usuario: usuarioId },
+      orderBy: { fecha: "desc" },
+    });
+    return actividades;
+  } catch (error) {
+    throw new Error(error.message || "No se pudo obtener la actividad reciente");
+  }
+}
+
 // 🧾 Obtener todas las publicaciones
 async function listPublicaciones() {
   try {
@@ -20,6 +51,8 @@ async function createPublicacion(data) {
     if (data.fecha_fin) data.fecha_fin = new Date(data.fecha_fin);
 
     const nuevaPublicacion = await prisma.publicaciones.create({ data });
+    // 📝 Registrar Actividad
+    await registrarActividad(usuarioId, `Creó la publicación: ${nuevaPublicacion.titulo} (ID: ${nuevaPublicacion.id_publicacion})`);
     return nuevaPublicacion;
   } catch (error) {
     throw new Error(error.message || "No se pudo crear la publicación");
@@ -41,6 +74,8 @@ async function updatePublicacion(id, data) {
       data, // Solo campos modificables
     });
 
+    await registrarActividad(usuarioId, `Actualizó la publicación: ${publicacionActualizada.titulo} (ID: ${id})`);
+
     return publicacionActualizada;
   } catch (error) {
     // Manejo de error específico de Prisma
@@ -58,6 +93,8 @@ async function deletePublicacion(id) {
     await prisma.publicaciones.delete({
       where: { id_publicacion: id }, 
     });
+    const titulo = publicacion ? publicacion.titulo : 'Desconocido';
+    await registrarActividad(usuarioId, `Eliminó la publicación: ${titulo} (ID: ${id})`);
   } catch (error) {
     throw new Error(error.message || "No se pudo eliminar la publicación");
   }
@@ -140,6 +177,11 @@ async function emailPublicacion(id_publicacion, destinatarios) {
     // Llamar a la función que envía el email y capturar resultado
     const resultadoEnvio = await sendUrgentEmail(publicacion, destinatarios);
 
+    if (resultadoEnvio.success) {
+      // 📝 Registrar Actividad solo si se envió con éxito
+      await registrarActividad(usuarioId, `Envió alerta por email de la publicación: ${publicacion.titulo}`);
+    }
+
     // Retornar resultado final
     return resultadoEnvio;
   } catch (error) {
@@ -153,5 +195,6 @@ module.exports = {
   createPublicacion,
   updatePublicacion,
   deletePublicacion,
-  emailPublicacion
+  emailPublicacion,
+  devolverActividad,
 };

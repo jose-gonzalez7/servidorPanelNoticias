@@ -77,10 +77,26 @@ async function emailPublicacionController(req, res) {
   }
 }
 
+async function devolverActividad(req, res) {
+  console.log("=== 🔹 Solicitud POST /publicaciones/actividad 🔹 ===");
+  console.log("Usuario que hace la petición:", req.user);
+  console.log("Datos recibidos para registrar actividad:", req.body);
+  const { usuarioId, descripcion } = req.body;
+
+  try {
+    await publicacionesService.registrarActividad(usuarioId, descripcion);
+    res.json({ success: true, mensaje: "Actividad registrada correctamente" });
+  } catch (error) {
+    console.error("Error al registrar actividad:", error.message);
+    res.status(400).json({ error: error.message });
+  }
+}
+
 module.exports = {
   getAllPublicaciones,
   createPublicacion,
   updatePublicacion,
   deletePublicacion,
-  emailPublicacionController
+  emailPublicacionController,
+  devolverActividad,
 };

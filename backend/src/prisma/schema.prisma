@@ -60,10 +60,11 @@ model email_log {
   @@index([id_publicacion, fecha_envio])
 }
 
-model actividad_reciente{
-  id_usuario String @id @db.VarChar(50)
-  actividad  String @db.Text
-  fecha      DateTime @default(now())
+model actividad_reciente {
+  id_actividad String   @id @default(uuid()) // ✅ Nueva PK única
+  id_usuario   String   @db.VarChar(50)      // Quién hizo la acción
+  actividad    String   @db.Text             // Qué hizo
+  fecha        DateTime @default(now())
 }
 
 

@@ -18,4 +18,6 @@ router.delete("/", verifyToken, requireRole("administrador", "editor"), publicac
 // Endpoint dedicado a enviar email de publicación
 router.post("/emailPublicaciones", verifyToken ,requireRole("administrador", "editor"), publicacionesController.emailPublicacionController);
 
+router.get("/actividad", publicacionesController.devolverActividad);
+
 module.exports = router;

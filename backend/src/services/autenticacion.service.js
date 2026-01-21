@@ -12,7 +12,7 @@ async function authenticateUser(email, password) {
   const token = jwt.sign(
     { id: user.id, email: user.email, rol: user.rol },
     process.env.JWT_SECRET,
-    { expiresIn: '2h' }
+    { expiresIn: '12h' }
   );
 
   return {
