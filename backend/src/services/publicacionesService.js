@@ -1,4 +1,3 @@
-const e = require("express");
 const prisma = require("../prisma/client");
 const nodemailer = require("nodemailer");
 
@@ -30,6 +29,18 @@ async function devolverActividad(usuarioId) {
     return actividades;
   } catch (error) {
     throw new Error(error.message || "No se pudo obtener la actividad reciente");
+  }
+}
+
+// 🔎 Obtener TODA la actividad reciente (para panel de administración)
+async function devolverTodaActividad() {
+  try {
+    const actividades = await prisma.actividad_reciente.findMany({
+      orderBy: { fecha: "desc" },
+    });
+    return actividades;
+  } catch (error) {
+    throw new Error(error.message || "No se pudo obtener la actividad reciente global");
   }
 }
 
@@ -197,4 +208,5 @@ module.exports = {
   deletePublicacion,
   emailPublicacion,
   devolverActividad,
+  devolverTodaActividad,
 };

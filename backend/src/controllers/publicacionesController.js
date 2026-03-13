@@ -80,15 +80,28 @@ async function emailPublicacionController(req, res) {
 async function devolverActividad(req, res) {
   console.log("=== 🔹 Solicitud POST /publicaciones/actividad 🔹 ===");
   console.log("Usuario que hace la petición:", req.user);
-  console.log("Datos recibidos para registrar actividad:", req.body);
-  const { usuarioId, descripcion } = req.body;
+  console.log("Datos recibidos para devolver actividad:", req.body);
+  const { usuarioId } = req.body;
 
   try {
-    await publicacionesService.registrarActividad(usuarioId, descripcion);
-    res.json({ success: true, mensaje: "Actividad registrada correctamente" });
+    const actividades = await publicacionesService.devolverActividad(usuarioId);
+    res.json(actividades);
   } catch (error) {
-    console.error("Error al registrar actividad:", error.message);
+    console.error("Error al devolver actividad:", error.message);
     res.status(400).json({ error: error.message });
+  }
+}
+
+async function devolverTodaActividad(req, res) {
+  console.log("=== 🔹 Solicitud GET /publicaciones/actividad-reciente 🔹 ===");
+  console.log("Usuario que hace la petición (admin):", req.user);
+
+  try {
+    const actividades = await publicacionesService.devolverTodaActividad();
+    res.json(actividades);
+  } catch (error) {
+    console.error("Error al devolver toda la actividad reciente:", error.message);
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -99,4 +112,5 @@ module.exports = {
   deletePublicacion,
   emailPublicacionController,
   devolverActividad,
+  devolverTodaActividad,
 };
