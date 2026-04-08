@@ -20,6 +20,14 @@ router.post("/emailPublicaciones", verifyToken ,requireRole("administrador", "ed
 
 router.get("/actividad", verifyToken, publicacionesController.devolverActividad);
 
+// Actividad global con nombres (dashboard editor / panel admin)
+router.get(
+  "/actividad-reciente-panel",
+  verifyToken,
+  requireRole("administrador", "editor"),
+  publicacionesController.getActividadRecientePanel
+);
+
 // Nueva ruta: devolver TODA la actividad reciente (solo admin)
 router.get(
   "/actividad-reciente",

@@ -10,7 +10,7 @@ async function authenticateUser(email, password) {
   if (!valid) throw new Error('Usuario o contraseña incorrectos');
 
   const token = jwt.sign(
-    { id: user.id, email: user.email, rol: user.rol },
+    { id: user.id_usuario, email: user.email, rol: user.rol },
     process.env.JWT_SECRET,
     { expiresIn: '12h' }
   );
@@ -18,7 +18,7 @@ async function authenticateUser(email, password) {
   return {
     token, // 👈 lo seguimos devolviendo INTERNAMENTE
     user: {
-      id: user.id,
+      id: user.id_usuario,
       nombre: user.nombre,
       email: user.email,
       rol: user.rol

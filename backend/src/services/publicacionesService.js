@@ -44,6 +44,31 @@ async function devolverTodaActividad() {
   }
 }
 
+/** Actividad global para panel (editor/admin): últimas N entradas con nombre de usuario */
+async function listActividadRecienteConUsuarios(limite = 20) {
+  const take = Math.min(Math.max(Number(limite) || 20, 1), 50);
+  const actividades = await prisma.actividad_reciente.findMany({
+    orderBy: { fecha: "desc" },
+    take,
+  });
+  const ids = [...new Set(actividades.map((a) => a.id_usuario).filter(Boolean))];
+  const usuarios =
+    ids.length > 0
+      ? await prisma.usuario.findMany({
+          where: { id_usuario: { in: ids } },
+          select: { id_usuario: true, nombre: true },
+        })
+      : [];
+  const nombres = Object.fromEntries(usuarios.map((u) => [u.id_usuario, u.nombre]));
+  return actividades.map((a) => ({
+    id_actividad: a.id_actividad,
+    id_usuario: a.id_usuario,
+    nombre_usuario: nombres[a.id_usuario] || "Usuario",
+    actividad: a.actividad,
+    fecha: a.fecha,
+  }));
+}
+
 // 🧾 Obtener todas las publicaciones
 async function listPublicaciones() {
   try {
@@ -55,15 +80,17 @@ async function listPublicaciones() {
 }
 
 // 🆕 Crear una nueva publicación
-async function createPublicacion(data) {
+async function createPublicacion(data, usuarioId) {
   try {
     // Convertir fechas si existen y vienen como string
     if (data.fecha_inicio) data.fecha_inicio = new Date(data.fecha_inicio);
     if (data.fecha_fin) data.fecha_fin = new Date(data.fecha_fin);
 
     const nuevaPublicacion = await prisma.publicaciones.create({ data });
-    // 📝 Registrar Actividad
-    await registrarActividad(usuarioId, `Creó la publicación: ${nuevaPublicacion.titulo} (ID: ${nuevaPublicacion.id_publicacion})`);
+    await registrarActividad(
+      usuarioId,
+      `Creó la publicación: ${nuevaPublicacion.titulo} (ID: ${nuevaPublicacion.id_publicacion})`
+    );
     return nuevaPublicacion;
   } catch (error) {
     throw new Error(error.message || "No se pudo crear la publicación");
@@ -71,7 +98,7 @@ async function createPublicacion(data) {
 }
 
 // ✏️ Actualizar una publicación existente
-async function updatePublicacion(id, data) {
+async function updatePublicacion(id, data, usuarioId) {
   try {
     // ✅ Convertir fechas a Date si vienen como string
     if (data.fecha_inicio) data.fecha_inicio = new Date(data.fecha_inicio);
@@ -85,7 +112,10 @@ async function updatePublicacion(id, data) {
       data, // Solo campos modificables
     });
 
-    await registrarActividad(usuarioId, `Actualizó la publicación: ${publicacionActualizada.titulo} (ID: ${id})`);
+    await registrarActividad(
+      usuarioId,
+      `Actualizó la publicación: ${publicacionActualizada.titulo} (ID: ${id})`
+    );
 
     return publicacionActualizada;
   } catch (error) {
@@ -99,13 +129,21 @@ async function updatePublicacion(id, data) {
 }
 
 // 🗑️ Eliminar una publicación
-async function deletePublicacion(id) {
+async function deletePublicacion(id, usuarioId) {
   try {
-    await prisma.publicaciones.delete({
-      where: { id_publicacion: id }, 
+    const publicacion = await prisma.publicaciones.findUnique({
+      where: { id_publicacion: id },
     });
-    const titulo = publicacion ? publicacion.titulo : 'Desconocido';
-    await registrarActividad(usuarioId, `Eliminó la publicación: ${titulo} (ID: ${id})`);
+    if (!publicacion) {
+      throw new Error(`No se encontró la publicación con id_publicacion=${id}`);
+    }
+    await prisma.publicaciones.delete({
+      where: { id_publicacion: id },
+    });
+    await registrarActividad(
+      usuarioId,
+      `Eliminó la publicación: ${publicacion.titulo} (ID: ${id})`
+    );
   } catch (error) {
     throw new Error(error.message || "No se pudo eliminar la publicación");
   }
@@ -174,7 +212,7 @@ async function sendUrgentEmail(publicacion, destinatarios) {
   }
 }
 
-async function emailPublicacion(id_publicacion, destinatarios) {
+async function emailPublicacion(id_publicacion, destinatarios, usuarioId) {
   try {
     if (!id_publicacion) throw new Error("Falta id_publicacion");
     if (!destinatarios || !destinatarios.length) throw new Error("Debe indicar al menos un destinatario");
@@ -189,8 +227,10 @@ async function emailPublicacion(id_publicacion, destinatarios) {
     const resultadoEnvio = await sendUrgentEmail(publicacion, destinatarios);
 
     if (resultadoEnvio.success) {
-      // 📝 Registrar Actividad solo si se envió con éxito
-      await registrarActividad(usuarioId, `Envió alerta por email de la publicación: ${publicacion.titulo}`);
+      await registrarActividad(
+        usuarioId,
+        `Envió alerta por email de la publicación: ${publicacion.titulo}`
+      );
     }
 
     // Retornar resultado final
@@ -209,4 +249,5 @@ module.exports = {
   emailPublicacion,
   devolverActividad,
   devolverTodaActividad,
+  listActividadRecienteConUsuarios,
 };

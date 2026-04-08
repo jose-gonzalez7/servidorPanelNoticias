@@ -19,7 +19,7 @@ async function createPublicacion(req, res) {
   console.log('Datos de la nueva publicación:', req.body);
 
   try {
-    const nuevaPublicacion = await publicacionesService.createPublicacion(req.body);
+    const nuevaPublicacion = await publicacionesService.createPublicacion(req.body, req.user.id);
     res.status(201).json(nuevaPublicacion);
   } catch (error) {
     console.error('Error al crear publicación:', error);
@@ -40,7 +40,11 @@ async function updatePublicacion(req, res) {
   }
 
   try {
-    const publicacionActualizada = await publicacionesService.updatePublicacion(id_publicacion, data);
+    const publicacionActualizada = await publicacionesService.updatePublicacion(
+      id_publicacion,
+      data,
+      req.user.id
+    );
     res.json(publicacionActualizada);
   } catch (error) {
     console.error('Error al actualizar publicación:', error);
@@ -54,7 +58,7 @@ async function deletePublicacion(req, res) {
   console.log('ID de la publicación a eliminar:', req.body.id_publicacion);
 
   try {
-    await publicacionesService.deletePublicacion(req.body.id_publicacion);
+    await publicacionesService.deletePublicacion(req.body.id_publicacion, req.user.id);
     res.status(204).send();
   } catch (error) {
     console.error('Error al eliminar publicación:', error);
@@ -69,7 +73,11 @@ async function emailPublicacionController(req, res) {
   const { id_publicacion, destinatarios } = req.body;
 
   try {
-    const result = await publicacionesService.emailPublicacion(id_publicacion, destinatarios);
+    const result = await publicacionesService.emailPublicacion(
+      id_publicacion,
+      destinatarios,
+      req.user.id
+    );
     res.json(result);
   } catch (error) {
     console.error("Error al enviar email de publicación:", error.message);
@@ -78,17 +86,26 @@ async function emailPublicacionController(req, res) {
 }
 
 async function devolverActividad(req, res) {
-  console.log("=== 🔹 Solicitud POST /publicaciones/actividad 🔹 ===");
+  console.log("=== 🔹 Solicitud GET /publicaciones/actividad 🔹 ===");
   console.log("Usuario que hace la petición:", req.user);
-  console.log("Datos recibidos para devolver actividad:", req.body);
-  const { usuarioId } = req.body;
 
   try {
-    const actividades = await publicacionesService.devolverActividad(usuarioId);
+    const actividades = await publicacionesService.devolverActividad(req.user.id);
     res.json(actividades);
   } catch (error) {
     console.error("Error al devolver actividad:", error.message);
     res.status(400).json({ error: error.message });
+  }
+}
+
+async function getActividadRecientePanel(req, res) {
+  try {
+    const limite = Math.min(parseInt(String(req.query.limite), 10) || 20, 50);
+    const actividades = await publicacionesService.listActividadRecienteConUsuarios(limite);
+    res.json(actividades);
+  } catch (error) {
+    console.error("Error al devolver actividad del panel:", error.message);
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -113,4 +130,5 @@ module.exports = {
   emailPublicacionController,
   devolverActividad,
   devolverTodaActividad,
+  getActividadRecientePanel,
 };
