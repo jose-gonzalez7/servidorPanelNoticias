@@ -11,26 +11,42 @@ const meRoutes = require('./routes/me');
 const app = express();
 
 /**
- * 🔐 ORÍGENES PERMITIDOS (AHORA SOLO LOCALHOST)
+ * 🔐 CORS: localhost + orígenes extra (p. ej. Vercel).
+ * Railway: ALLOWED_ORIGINS=https://tu-app.vercel.app,https://otro.vercel.app
+ * (sin espacios raros; la barra final es opcional — se normaliza)
  */
-const allowedOrigins = [
-  'http://localhost:3001',
-  'http://localhost:3000',
-];
+function normalizeOrigin(url) {
+  if (!url || typeof url !== "string") return "";
+  return url.trim().replace(/\/$/, "");
+}
 
-app.use(cors({
-  origin: (origin, callback) => {
-    // Permitir peticiones sin origin (Postman, curl, SSR)
-    if (!origin) return callback(null, true);
+const defaultOrigins = ["http://localhost:3001", "http://localhost:3000"].map(
+  normalizeOrigin
+);
+const extraOrigins = (process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((s) => normalizeOrigin(s))
+  .filter(Boolean);
+const allowedOrigins = [...new Set([...defaultOrigins, ...extraOrigins])];
 
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
+if (process.env.NODE_ENV !== "test") {
+  console.log("[CORS] Orígenes permitidos:", allowedOrigins.join(" | "));
+}
 
-    return callback(new Error(`CORS bloqueado: ${origin}`));
-  },
-  credentials: true, // 🔴 OBLIGATORIO para cookies
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const o = normalizeOrigin(origin);
+      if (allowedOrigins.includes(o)) {
+        return callback(null, true);
+      }
+      console.warn("[CORS] Origen rechazado:", origin, "| configurados:", allowedOrigins.length);
+      return callback(new Error(`CORS bloqueado: ${origin}`));
+    },
+    credentials: true,
+  })
+);
 
 /**
  * Middlewares base
