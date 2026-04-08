@@ -69,6 +69,22 @@ async function listActividadRecienteConUsuarios(limite = 20) {
   }));
 }
 
+/** Comprueba que id_categoria exista en categoria (evita error de FK en BD). */
+async function assertCategoriaExiste(id_categoria) {
+  const id = id_categoria != null ? String(id_categoria).trim() : "";
+  if (!id) {
+    throw new Error("VALIDACION: Debes indicar una categoría.");
+  }
+  const cat = await prisma.categoria.findUnique({
+    where: { id_categoria: id },
+  });
+  if (!cat) {
+    throw new Error(
+      `VALIDACION: No existe ninguna categoría con id "${id}". Elige una categoría válida (panel Administración → Categorías).`
+    );
+  }
+}
+
 // 🧾 Obtener todas las publicaciones
 async function listPublicaciones() {
   try {
@@ -85,6 +101,8 @@ async function createPublicacion(data, usuarioId) {
     // Convertir fechas si existen y vienen como string
     if (data.fecha_inicio) data.fecha_inicio = new Date(data.fecha_inicio);
     if (data.fecha_fin) data.fecha_fin = new Date(data.fecha_fin);
+
+    await assertCategoriaExiste(data.id_categoria);
 
     const nuevaPublicacion = await prisma.publicaciones.create({ data });
     await registrarActividad(
@@ -106,6 +124,10 @@ async function updatePublicacion(id, data, usuarioId) {
 
     // ❌ Asegurarse de no intentar actualizar la clave primaria
     delete data.id_publicacion;
+
+    if (data.id_categoria !== undefined) {
+      await assertCategoriaExiste(data.id_categoria);
+    }
 
     const publicacionActualizada = await prisma.publicaciones.update({
       where: { id_publicacion: id }, // ID separado del body

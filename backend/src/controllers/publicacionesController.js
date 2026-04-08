@@ -23,6 +23,12 @@ async function createPublicacion(req, res) {
     res.status(201).json(nuevaPublicacion);
   } catch (error) {
     console.error('Error al crear publicación:', error);
+    const msg = error.message || '';
+    if (msg.startsWith('VALIDACION:')) {
+      return res.status(400).json({
+        error: msg.replace(/^VALIDACION:\s*/, ''),
+      });
+    }
     res.status(500).json({ error: 'Error al crear publicación' });
   }
 };
@@ -48,6 +54,10 @@ async function updatePublicacion(req, res) {
     res.json(publicacionActualizada);
   } catch (error) {
     console.error('Error al actualizar publicación:', error);
+    const msg = error.message || '';
+    if (msg.startsWith('VALIDACION:')) {
+      return res.status(400).json({ error: msg.replace(/^VALIDACION:\s*/, '') });
+    }
     res.status(500).json({ error: error.message });
   }
 }
